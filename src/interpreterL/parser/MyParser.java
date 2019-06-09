@@ -118,13 +118,33 @@ public class MyParser implements Parser {
 		return new Block(stmts);
 	}
 
-	private Exp parseExp() throws ParserException {
-		Exp exp = parseEq();
-		while (tokenizer.tokenType() == AND) {
+	private ExpSeq parseExpSeq() throws ParserException {
+		Exp exp = parseExp();
+		if (tokenizer.tokenType() == STMT_SEP) {
 			tryNext();
-			exp = new And(exp, parseEq());
+			return new MoreExp(exp, parseExpSeq());
 		}
-		return exp;
+		return new SingleExp(exp);
+	}
+
+
+	private Exp parseExp() throws ParserException {
+
+		if(tokenizer.tokenType() == OPEN_BLOCK){
+			consume(OPEN_BLOCK);
+			Set set = new Set (parseExp(), parseExpSeq());
+			consume(CLOSE_BLOCK);
+			return set;
+		}
+
+		else {
+			Exp exp = parseEq();
+			while (tokenizer.tokenType() == AND) {
+				tryNext();
+				exp = new And(exp, parseEq());
+			}
+			return exp;
+		}
 	}
 
 	private Exp parseEq() throws ParserException {

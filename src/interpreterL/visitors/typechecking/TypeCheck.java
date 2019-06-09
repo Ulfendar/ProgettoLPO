@@ -150,4 +150,6 @@ public class TypeCheck implements Visitor<Type> {
 		return exp.accept(this).getSndPairType();
 	}
 
+
+
 }

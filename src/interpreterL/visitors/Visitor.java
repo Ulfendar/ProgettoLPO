@@ -1,10 +1,6 @@
 package interpreterL.visitors;
 
-import interpreterL.parser.ast.Block;
-import interpreterL.parser.ast.Exp;
-import interpreterL.parser.ast.Ident;
-import interpreterL.parser.ast.Stmt;
-import interpreterL.parser.ast.StmtSeq;
+import interpreterL.parser.ast.*;
 
 public interface Visitor<T> {
 	T visitAdd(Exp left, Exp right);
@@ -46,4 +42,11 @@ public interface Visitor<T> {
 	T visitFst(Exp exp);
 
 	T visitSnd(Exp exp);
+
+	T visitSingleExp(Exp exp);
+
+	T visitMoreExp(Exp first, ExpSeq res);
+
+	T visitSet(Exp first, ExpSeq res);
+
 }

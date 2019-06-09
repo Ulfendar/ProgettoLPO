@@ -156,6 +156,13 @@ public class Eval implements Visitor<Value> {
 		return exp.accept(this).asPair().getSndVal();
 	}
 
+	@Override
+	public Value visitSet(Exp first, ExpSeq res) {
+		first.accept(this);
+		res.accept(this);
+		return new Set(first, res);
+	}
+
 	public static void main(String[] args) {
 		try (Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(System.in))) {
 			Parser parser = new MyParser(tokenizer);
