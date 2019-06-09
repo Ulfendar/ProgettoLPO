@@ -16,7 +16,7 @@ public class StringValue extends PrimValue<String> {
     }
 
     @Override
-    public String asString() {
+    public String toString() {
         return value;
     }
 }

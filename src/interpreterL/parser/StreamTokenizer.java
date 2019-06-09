@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class StreamTokenizer implements Tokenizer {
 	private static final String regEx;
 	private static final Map<String, TokenType> keywords = new HashMap<>();
