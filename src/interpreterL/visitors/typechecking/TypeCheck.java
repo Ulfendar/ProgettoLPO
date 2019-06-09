@@ -150,4 +150,14 @@ public class TypeCheck implements Visitor<Type> {
 		return exp.accept(this).getSndPairType();
 	}
 
+	@Override
+	public Type visitCat(Exp left, Exp right) {
+		checkBinOp(left, right, STRING);
+		return STRING;
+	}
+
+	@Override
+	public Type visitStringLiteral(String value) { return STRING;}
+
+
 }

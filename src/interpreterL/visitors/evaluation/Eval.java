@@ -102,8 +102,8 @@ public class Eval implements Visitor<Value> {
 	}
 
 	@Override
-	public Value visitConc(Exp left, Exp right) {
-		return new StringValue(left.accept(this).asString() + right.accept(this).asString());
+	public Value visitCat(Exp left, Exp right) {
+		return new StringValue(left.accept(this).toString() + right.accept(this).toString());
 	}
 
 
@@ -163,7 +163,6 @@ public class Eval implements Visitor<Value> {
 	}
 
 	public Value visitStringLiteral(String value) {
-		// completare
 		return new StringValue(value);
 	}
 

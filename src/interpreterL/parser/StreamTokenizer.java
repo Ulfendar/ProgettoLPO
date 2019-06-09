@@ -1,6 +1,7 @@
 package interpreterL.parser;
 
 import static interpreterL.parser.TokenType.*;
+import static org.apache.commons.lang3.StringEscapeUtils.unescapeJava;
 
 import java.io.Reader;
 import java.util.HashMap;
@@ -25,10 +26,10 @@ public class StreamTokenizer implements Tokenizer {
 		// remark: groups must correspond to the ordinal of the corresponding
 		// token type
 		final String skipRegEx = "(\\s+|//.*)"; // group 1
-		final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 2
+		final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 2-3
 		final String numRegEx = "(0|[1-9][0-9]*)"; // group 3
-		final String stringRegEx = "(\"(.*)\")"; //group 4
-		final String symbolRegEx = "\\+|\\*|==|=|\\(|\\)|\\[|\\]|;|,|\\{|\\}|-|!|&&";
+		final String stringRegEx = "(\"([^\"]*)\")"; //group 4
+		final String symbolRegEx = "\\+|\\*|==|=|\\(|\\)|\\[|\\]|;|,|\\{|\\}|-|!|&&|\\^";
 		regEx = skipRegEx + "|" + identRegEx + "|" + numRegEx + "|" + symbolRegEx + "|" + stringRegEx;
 	}
 
@@ -59,7 +60,7 @@ public class StreamTokenizer implements Tokenizer {
 		symbols.put("!", NOT);
 		symbols.put("&&", AND);
 		symbols.put("==", EQ);
-		symbols.put("^", CONC);
+		symbols.put("^", CAT);
 	}
 
 	public StreamTokenizer(Reader reader) {
@@ -68,6 +69,7 @@ public class StreamTokenizer implements Tokenizer {
 
 	private void checkType() {
 		tokenString = scanner.group();
+
 		if (scanner.group(IDENT.ordinal()) != null) { // IDENT or BOOL or a keyword
 			tokenType = keywords.get(tokenString);
 			if (tokenType == null)
@@ -76,6 +78,13 @@ public class StreamTokenizer implements Tokenizer {
 				boolValue = Boolean.parseBoolean(tokenString);
 			return;
 		}
+
+		if (scanner.group(STR.ordinal()) != null) { // STR
+			tokenType = STR;
+			strValue = unescapeJava(scanner.group(STR_CONTENT.ordinal()));//tokenString;
+			return;
+		}
+
 		if (scanner.group(NUM.ordinal()) != null) { // NUM
 			tokenType = NUM;
 			intValue = Integer.parseInt(tokenString);
@@ -85,13 +94,7 @@ public class StreamTokenizer implements Tokenizer {
 			tokenType = SKIP;
 			return;
 		}
-		if (scanner.group(STR.ordinal()) != null) { // STR
-			tokenType = STR;
-			//tokenString = scanner.group(5);
 
-			strValue = unescapeJava(scanner.group(STR_CONTENT.ordinal()));//tokenString;
-			return;
-		}
 		tokenType = symbols.get(tokenString); // a symbol
 		if (tokenType == null)
 			throw new AssertionError("Fatal error");

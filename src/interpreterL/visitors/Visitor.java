@@ -49,5 +49,5 @@ public interface Visitor<T> {
 
 	T visitStringLiteral(String value);
 
-	T visitConc(Exp left, Exp right);
+	T visitCat(Exp left, Exp right);
 }

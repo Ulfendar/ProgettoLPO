@@ -10,15 +10,15 @@ Prog ::= StmtSeq 'EOF'
  StmtSeq ::= Stmt (';' StmtSeq)?
  Stmt ::= 'let'? ID '=' Exp | 'print' Exp |  'if' '(' Exp ')' '{' StmtSeq '}' ('else' '{' StmtSeq '}')?
  ExpSeq ::= Exp (, ExpSeq)?;
- Exp ::= Eq ('&&' Eq)* | Exp ^ Exp | Exp \/ Exp | Exp /\ Exp | Exp in Exp | # Exp
+ Exp ::= Eq ('&&' Eq)* | {ExpSeq} | Exp ^ Exp | Exp \/ Exp | Exp /\ Exp | Exp in Exp | # Exp
  Eq ::= In ('==' In)*
  In ::= Union (in Union)*
  Union ::= Intersect (\/ Intersect)*
- Intersect ::= Conc (^ Conc)*
- Conc ::= Add (^ Add)*
+ Intersect ::= Cat (^ Cat)*
+ Cat ::= Add (^ Add)*
  Add ::= Mul ('+' Mul)*
  Mul::= Atom ('*' Atom)*
- Atom ::= '[' Exp ',' Exp ']' | {ExpSeq} | STRING | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')' | # Atom
+ Atom ::= '[' Exp ',' Exp ']'  | STRING | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')' | # Atom
 */
 
 public class  MyParser implements Parser {
@@ -133,19 +133,19 @@ public class  MyParser implements Parser {
 	}
 
 	private Exp parseEq() throws ParserException {
-		Exp exp = parseConc();
+		Exp exp = parseCat();
 		while (tokenizer.tokenType() == EQ) {
 			tryNext();
-			exp = new Eq(exp, parseConc());
+			exp = new Eq(exp, parseCat());
 		}
 		return exp;
 	}
 
-	private Exp parseConc() throws ParserException {
+	private Exp parseCat() throws ParserException {
 		Exp exp = parseAdd();
-		while (tokenizer.tokenType() == CONC) {
-			tryNext();
-			exp = new Conc(exp, parseAdd());
+		while (tokenizer.tokenType() == CAT) {
+			consume(CAT);
+			exp = new Cat(exp, parseAdd());
 		}
 		return exp;
 	}
@@ -192,6 +192,7 @@ public class  MyParser implements Parser {
 				return parseSnd();
 			case STR:
 				return parseStringLit();
+
 		}
 	}
 
