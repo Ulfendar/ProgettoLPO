@@ -8,15 +8,20 @@ import interpreterL.parser.ast.*;
 /*
 Prog ::= StmtSeq 'EOF'
  StmtSeq ::= Stmt (';' StmtSeq)?
- Stmt ::= 'let'? ID '=' Exp | 'print' Exp |  'if' '(' Exp ')' '{' StmtSeq '}' ('else' '{' StmtSeq '}')? 
- Exp ::= Eq ('&&' Eq)* 
- Eq ::= Add ('==' Add)*
+ Stmt ::= 'let'? ID '=' Exp | 'print' Exp |  'if' '(' Exp ')' '{' StmtSeq '}' ('else' '{' StmtSeq '}')?
+ ExpSeq ::= Exp (, ExpSeq)?;
+ Exp ::= Eq ('&&' Eq)* | Exp ^ Exp | Exp \/ Exp | Exp /\ Exp | Exp in Exp | # Exp
+ Eq ::= In ('==' In)*
+ In ::= Union (in Union)*
+ Union ::= Intersect (\/ Intersect)*
+ Intersect ::= Conc (^ Conc)*
+ Conc ::= Add (^ Add)*
  Add ::= Mul ('+' Mul)*
  Mul::= Atom ('*' Atom)*
- Atom ::= '[' Exp ',' Exp ']' | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')'
+ Atom ::= '[' Exp ',' Exp ']' | {ExpSeq} | STRING | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')' | # Atom
 */
 
-public class MyParser implements Parser {
+public class  MyParser implements Parser {
 
 	private final Tokenizer tokenizer;
 
@@ -67,16 +72,16 @@ public class MyParser implements Parser {
 
 	private Stmt parseStmt() throws ParserException {
 		switch (tokenizer.tokenType()) {
-		default:
-			unexpectedTokenError();
-		case PRINT:
-			return parsePrintStmt();
-		case LET:
-			return parseVarStmt();
-		case IDENT:
-			return parseAssignStmt();
-		case IF:
-			return parseIfStmt();
+			default:
+				unexpectedTokenError();
+			case PRINT:
+				return parsePrintStmt();
+			case LET:
+				return parseVarStmt();
+			case IDENT:
+				return parseAssignStmt();
+			case IF:
+				return parseIfStmt();
 		}
 	}
 
@@ -128,10 +133,19 @@ public class MyParser implements Parser {
 	}
 
 	private Exp parseEq() throws ParserException {
-		Exp exp = parseAdd();
+		Exp exp = parseConc();
 		while (tokenizer.tokenType() == EQ) {
 			tryNext();
-			exp = new Eq(exp, parseAdd());
+			exp = new Eq(exp, parseConc());
+		}
+		return exp;
+	}
+
+	private Exp parseConc() throws ParserException {
+		Exp exp = parseAdd();
+		while (tokenizer.tokenType() == CONC) {
+			tryNext();
+			exp = new Conc(exp, parseAdd());
 		}
 		return exp;
 	}
@@ -156,26 +170,28 @@ public class MyParser implements Parser {
 
 	private Exp parseAtom() throws ParserException {
 		switch (tokenizer.tokenType()) {
-		default:
-			unexpectedTokenError();
-		case NUM:
-			return parseNum();
-		case IDENT:
-			return parseIdent();
-		case MINUS:
-			return parseMinus();
-		case OPEN_PAR:
-			return parseRoundPar();
-		case BOOL:
-			return parseBoolean();
-		case NOT:
-			return parseNot();
-		case OPEN_PAIR:
-			return parsePairLit();
-		case FST:
-			return parseFst();
-		case SND:
-			return parseSnd();
+			default:
+				unexpectedTokenError();
+			case NUM:
+				return parseNum();
+			case IDENT:
+				return parseIdent();
+			case MINUS:
+				return parseMinus();
+			case OPEN_PAR:
+				return parseRoundPar();
+			case BOOL:
+				return parseBoolean();
+			case NOT:
+				return parseNot();
+			case OPEN_PAIR:
+				return parsePairLit();
+			case FST:
+				return parseFst();
+			case SND:
+				return parseSnd();
+			case STR:
+				return parseStringLit();
 		}
 	}
 
@@ -224,6 +240,12 @@ public class MyParser implements Parser {
 		Exp right = parseExp();
 		consume(CLOSE_PAIR);
 		return new PairLit(left, right);
+	}
+
+	private StringLiteral parseStringLit() throws ParserException{
+		String val = String.valueOf(tokenizer.strValue());
+		consume(STR);
+		return new StringLiteral(val);
 	}
 
 	private Exp parseRoundPar() throws ParserException {

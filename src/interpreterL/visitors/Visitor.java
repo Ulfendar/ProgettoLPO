@@ -46,4 +46,8 @@ public interface Visitor<T> {
 	T visitFst(Exp exp);
 
 	T visitSnd(Exp exp);
+
+	T visitStringLiteral(String value);
+
+	T visitConc(Exp left, Exp right);
 }

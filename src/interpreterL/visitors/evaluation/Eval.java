@@ -102,6 +102,12 @@ public class Eval implements Visitor<Value> {
 	}
 
 	@Override
+	public Value visitConc(Exp left, Exp right) {
+		return new StringValue(left.accept(this).asString() + right.accept(this).asString());
+	}
+
+
+	@Override
 	public Value visitIntLiteral(int value) {
 		return new IntValue(value);
 	}
@@ -154,6 +160,11 @@ public class Eval implements Visitor<Value> {
 	@Override
 	public Value visitSnd(Exp exp) {
 		return exp.accept(this).asPair().getSndVal();
+	}
+
+	public Value visitStringLiteral(String value) {
+		// completare
+		return new StringValue(value);
 	}
 
 	public static void main(String[] args) {

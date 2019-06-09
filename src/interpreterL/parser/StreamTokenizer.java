@@ -12,11 +12,12 @@ public class StreamTokenizer implements Tokenizer {
 	private static final Map<String, TokenType> symbols = new HashMap<>();
 
 	private boolean hasNext = true; // any stream contains at least the EOF
-									// token
+	// token
 	private TokenType tokenType;
 	private String tokenString;
 	private int intValue;
 	private boolean boolValue;
+	private String strValue;
 	private final Scanner scanner;
 
 	static {
@@ -25,8 +26,9 @@ public class StreamTokenizer implements Tokenizer {
 		final String skipRegEx = "(\\s+|//.*)"; // group 1
 		final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 2
 		final String numRegEx = "(0|[1-9][0-9]*)"; // group 3
+		final String stringRegEx = "(\"(.*)\")"; //group 4
 		final String symbolRegEx = "\\+|\\*|==|=|\\(|\\)|\\[|\\]|;|,|\\{|\\}|-|!|&&";
-		regEx = skipRegEx + "|" + identRegEx + "|" + numRegEx + "|" + symbolRegEx;
+		regEx = skipRegEx + "|" + identRegEx + "|" + numRegEx + "|" + symbolRegEx + "|" + stringRegEx;
 	}
 
 	static {
@@ -56,6 +58,7 @@ public class StreamTokenizer implements Tokenizer {
 		symbols.put("!", NOT);
 		symbols.put("&&", AND);
 		symbols.put("==", EQ);
+		symbols.put("^", CONC);
 	}
 
 	public StreamTokenizer(Reader reader) {
@@ -79,6 +82,13 @@ public class StreamTokenizer implements Tokenizer {
 		}
 		if (scanner.group(SKIP.ordinal()) != null) { // SKIP
 			tokenType = SKIP;
+			return;
+		}
+		if (scanner.group(STR.ordinal()) != null) { // STR
+			tokenType = STR;
+			//tokenString = scanner.group(5);
+
+			strValue = unescapeJava(scanner.group(STR_CONTENT.ordinal()));//tokenString;
 			return;
 		}
 		tokenType = symbols.get(tokenString); // a symbol
@@ -131,6 +141,12 @@ public class StreamTokenizer implements Tokenizer {
 	public int intValue() {
 		checkValidToken(NUM);
 		return intValue;
+	}
+
+	@Override
+	public String strValue() {
+		checkValidToken(STR);
+		return strValue;
 	}
 
 	@Override
