@@ -7,12 +7,18 @@ import interpreterL.environments.EnvironmentException;
 import interpreterL.environments.GenEnvironment;
 import interpreterL.parser.ast.*;
 import interpreterL.visitors.Visitor;
+import interpreterL.visitors.evaluation.SetValue;
+import interpreterL.visitors.evaluation.Value;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TypeCheck implements Visitor<Type> {
 
 	private final GenEnvironment<Type> env = new GenEnvironment<>();
 
 	private void checkBinOp(Exp left, Exp right, Type type) {
+		System.out.println(left + " " + right);
 		type.checkEqual(left.accept(this));
 		type.checkEqual(right.accept(this));
 	}
@@ -65,6 +71,13 @@ public class TypeCheck implements Visitor<Type> {
 		env.enterScope();
 		stmtSeq.accept(this);
 		env.exitScope();
+		return null;
+	}
+
+	@Override
+	public Type visitWhileStmt(Exp exp, Block block) {
+		BOOL.checkEqual(exp.accept(this));
+		block.accept(this);
 		return null;
 	}
 
@@ -151,5 +164,56 @@ public class TypeCheck implements Visitor<Type> {
 	}
 
 
+	public Type visitExpList(List<Exp> exps){
+		Type type = exps.get(0).accept(this);
+		for(Exp exp : exps)
+			type.checkEqual(exp.accept(this));
+		return type;
+	}
+
+	@Override
+	public Type visitSet(ExpSeq elem){
+		SetType set = new SetType(elem.accept(this));
+		return set;
+	}
+
+	@Override
+	public Type visitUnion(Exp left, Exp right){
+
+		checkBinOp(left, right, SET);
+		return SET;
+
+	}
+
+	public Type visitIntersection(Exp left, Exp right){
+		checkBinOp(left, right, SET);
+		return SET;
+	}
+
+	public Type visitSize(Exp exp){
+		 Type type = exp.accept(this);
+		 System.out.println(type);
+		 type.checkEquals();
+		 System.out.println(type);
+		 return INT;
+	}
+
+	@Override
+	public Type visitIn(Exp elem, Exp set) {
+		Type type = set.accept(this);
+		type.checkIsSetType();
+		System.out.println(type);
+		type.getSetType().checkEqualIn(elem.accept(this));
+		return BOOL;
+	}
+
+	@Override
+	public Type visitStringLiteral(String value) { return STRING;}
+
+	@Override
+	public Type visitCat(Exp left, Exp right) {
+		checkBinOp(left, right, STRING);
+		return STRING;
+	}
 
 }

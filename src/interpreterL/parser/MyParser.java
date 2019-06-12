@@ -8,9 +8,13 @@ import interpreterL.parser.ast.*;
 /*
 Prog ::= StmtSeq 'EOF'
  StmtSeq ::= Stmt (';' StmtSeq)?
- Stmt ::= 'let'? ID '=' Exp | 'print' Exp |  'if' '(' Exp ')' '{' StmtSeq '}' ('else' '{' StmtSeq '}')? 
- Exp ::= Eq ('&&' Eq)* 
- Eq ::= Add ('==' Add)*
+ Stmt ::= WHILE(Exp){StmtSeq} | 'let'? ID '=' Exp | 'print' Exp |  'if' '(' Exp ')' '{' StmtSeq '}' ('else' '{' StmtSeq '}')?
+ Exp ::= Eq ('&&' Eq)* | Exp \/ EQ | Exp /\ EQ | Exp in Exp
+ Eq ::= UNION ('==' UNION)* //parseIn
+ In     //parseUnion
+ UNION  parseInter
+ INTER parseCat
+ CAT   parseAdd
  Add ::= Mul ('+' Mul)*
  Mul::= Atom ('*' Atom)*
  Atom ::= '[' Exp ',' Exp ']' | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')'
@@ -23,6 +27,7 @@ public class MyParser implements Parser {
 	private void tryNext() throws ParserException {
 		try {
 			tokenizer.next();
+
 		} catch (TokenizerException e) {
 			throw new ParserException(e);
 		}
@@ -38,6 +43,7 @@ public class MyParser implements Parser {
 	private void consume(TokenType expected) throws ParserException {
 		match(expected);
 		tryNext();
+
 	}
 
 	private void unexpectedTokenError() throws ParserException {
@@ -68,21 +74,36 @@ public class MyParser implements Parser {
 	private Stmt parseStmt() throws ParserException {
 		switch (tokenizer.tokenType()) {
 		default:
+			System.out.println(tokenizer.tokenType() + "err");
 			unexpectedTokenError();
 		case PRINT:
 			return parsePrintStmt();
 		case LET:
 			return parseVarStmt();
 		case IDENT:
+			System.out.println(tokenizer.tokenType() + "ident block");
 			return parseAssignStmt();
 		case IF:
 			return parseIfStmt();
+			case WHILE:
+				return parseWhileStmt();
+
 		}
 	}
 
 	private PrintStmt parsePrintStmt() throws ParserException {
+		System.out.println("print");
 		consume(PRINT); // or tryNext();
 		return new PrintStmt(parseExp());
+	}
+
+	private WhileStmt parseWhileStmt() throws ParserException {
+		consume(WHILE); // or tryNext();
+		consume(OPEN_PAR);
+		Exp exp = parseExp();
+		consume(CLOSE_PAR);
+		Block block = parseBlock();
+		return new WhileStmt(exp, block);
 	}
 
 	private DecStmt parseVarStmt() throws ParserException {
@@ -113,45 +134,89 @@ public class MyParser implements Parser {
 
 	private Block parseBlock() throws ParserException {
 		consume(OPEN_BLOCK);
+		System.out.println(tokenizer.tokenType() + "pre block block");
 		StmtSeq stmts = parseStmtSeq();
+		System.out.println(tokenizer.tokenType() + "pre block block");
 		consume(CLOSE_BLOCK);
 		return new Block(stmts);
 	}
 
-	private ExpSeq parseExpSeq() throws ParserException {
-		Exp exp = parseExp();
-		if (tokenizer.tokenType() == STMT_SEP) {
+	private ExpSeq parseExpList() throws ParserException {
+		ExpList exps = new ExpList(parseExp());
+		while (tokenizer.tokenType() == EXP_SEP) {
 			tryNext();
-			return new MoreExp(exp, parseExpSeq());
+
+			exps.add(parseExp());
 		}
-		return new SingleExp(exp);
-	}
+		return exps;
+		}
+
 
 
 	private Exp parseExp() throws ParserException {
 
-		if(tokenizer.tokenType() == OPEN_BLOCK){
-			consume(OPEN_BLOCK);
-			Set set = new Set (parseExp(), parseExpSeq());
-			consume(CLOSE_BLOCK);
-			return set;
+	Exp exp = parseEq();//exp = parseUnion(); //parseAnd
+
+		while (tokenizer.tokenType() == AND) {
+			tryNext();
+			exp = new And(exp, parseEq());
 		}
 
-		else {
-			Exp exp = parseEq();
-			while (tokenizer.tokenType() == AND) {
-				tryNext();
-				exp = new And(exp, parseEq());
-			}
-			return exp;
-		}
+		return exp;
+
 	}
 
 	private Exp parseEq() throws ParserException {
-		Exp exp = parseAdd();
+		Exp exp = parseIn();
 		while (tokenizer.tokenType() == EQ) {
 			tryNext();
-			exp = new Eq(exp, parseAdd());
+			exp = new Eq(exp, parseIn());
+		}
+		return exp;
+	}
+
+	private Exp parseIn() throws ParserException{
+		Exp exp = parseUnion();
+
+		while (tokenizer.tokenType() == IN) {
+			tryNext();
+
+			exp = new In(exp, parseUnion());
+		}
+
+		return exp;
+
+	}
+
+
+	public Exp parseUnion()throws ParserException{
+		Exp exp = parseIntersection();
+
+		while(tokenizer.tokenType()==UNION) {
+			consume(UNION);
+
+			return new Union(exp, parseIntersection());
+		}
+		return exp;
+	}
+
+
+	public Exp parseIntersection()throws ParserException{
+		Exp exp = parseCat();
+
+		while(tokenizer.tokenType()==INTERSECTION) {
+			consume(INTERSECTION);
+			return new Intersection(exp, parseCat());
+		}
+		return exp;
+	}
+
+
+	private Exp parseCat() throws ParserException {
+		Exp exp = parseAdd();
+		while (tokenizer.tokenType() == CAT) {
+			tryNext();
+			exp = new Cat(exp, parseAdd());
 		}
 		return exp;
 	}
@@ -196,8 +261,28 @@ public class MyParser implements Parser {
 			return parseFst();
 		case SND:
 			return parseSnd();
+		case SIZE:
+			return parseSize();
+		case OPEN_BLOCK:
+			return parseSet();
+		case STRING:
+			return parseStringLit();
 		}
 	}
+
+	public Size parseSize() throws ParserException{
+		consume(SIZE);
+		return new Size(parseAtom());
+	}
+
+	private Exp parseSet() throws ParserException {
+		consume(OPEN_BLOCK);
+		Set set = new Set(parseExpList());
+		consume(CLOSE_BLOCK);
+
+		return set;
+	}
+
 
 	private IntLiteral parseNum() throws ParserException {
 		int val = tokenizer.intValue();
@@ -252,5 +337,12 @@ public class MyParser implements Parser {
 		consume(CLOSE_PAR);
 		return exp;
 	}
+
+	private StringLiteral parseStringLit() throws ParserException{
+		String val = tokenizer.strValue();
+		consume(STRING);
+		return new StringLiteral(val);
+	}
+
 
 }

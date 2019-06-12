@@ -12,4 +12,6 @@ public class MoreStmt extends More<Stmt, StmtSeq> implements StmtSeq {
 	public <T> T accept(Visitor<T> visitor) {
 		return visitor.visitMoreStmt(first, rest);
 	}
+
+	public String toString(){return first.toString() + ", " + rest.toString();}
 }

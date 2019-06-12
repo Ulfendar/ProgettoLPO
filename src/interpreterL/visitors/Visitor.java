@@ -2,6 +2,8 @@ package interpreterL.visitors;
 
 import interpreterL.parser.ast.*;
 
+import java.util.List;
+
 public interface Visitor<T> {
 	T visitAdd(Exp left, Exp right);
 
@@ -43,10 +45,22 @@ public interface Visitor<T> {
 
 	T visitSnd(Exp exp);
 
-	T visitSingleExp(Exp exp);
+	T visitSet(ExpSeq res);
 
-	T visitMoreExp(Exp first, ExpSeq res);
+	T visitExpList(List<Exp> exps);
 
-	T visitSet(Exp first, ExpSeq res);
+	T visitUnion(Exp set1, Exp set2);
+
+	T visitIntersection(Exp set1, Exp set2);
+
+	T visitSize(Exp exp);
+
+	T visitStringLiteral(String value);
+
+	T visitCat(Exp left, Exp right);
+
+	T visitIn(Exp left, Exp right);
+
+	T visitWhileStmt(Exp exp, Block block);
 
 }

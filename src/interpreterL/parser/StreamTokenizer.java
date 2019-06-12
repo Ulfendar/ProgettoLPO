@@ -18,6 +18,7 @@ public class StreamTokenizer implements Tokenizer {
 	private int intValue;
 	private boolean boolValue;
 	private final Scanner scanner;
+	private String strValue;
 
 	static {
 		// remark: groups must correspond to the ordinal of the corresponding
@@ -25,8 +26,9 @@ public class StreamTokenizer implements Tokenizer {
 		final String skipRegEx = "(\\s+|//.*)"; // group 1
 		final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 2
 		final String numRegEx = "(0|[1-9][0-9]*)"; // group 3
-		final String symbolRegEx = "\\+|\\*|==|=|\\(|\\)|\\[|\\]|;|,|\\{|\\}|-|!|&&";
-		regEx = skipRegEx + "|" + identRegEx + "|" + numRegEx + "|" + symbolRegEx;
+		final String stringRegEx = "(\"((?:[^\"\\\\]|\\\\[\"\\\\])*)\")"; //group 4
+		final String symbolRegEx = "\\+|\\*|==|=|\\(|\\)|\\[|\\]|;|,|\\{|\\}|-|!|&&|\\\\/|/\\\\|#|\\^";
+		regEx = skipRegEx + "|" + identRegEx + "|" + numRegEx + "|" +  stringRegEx +"|"+ symbolRegEx;
 	}
 
 	static {
@@ -38,6 +40,9 @@ public class StreamTokenizer implements Tokenizer {
 		keywords.put("else", ELSE);
 		keywords.put("fst", FST);
 		keywords.put("snd", SND);
+		keywords.put("in", IN);
+		keywords.put("while", WHILE);
+
 	}
 
 	static {
@@ -56,6 +61,10 @@ public class StreamTokenizer implements Tokenizer {
 		symbols.put("!", NOT);
 		symbols.put("&&", AND);
 		symbols.put("==", EQ);
+		symbols.put("\\/", UNION);
+		symbols.put("/\\", INTERSECTION);
+		symbols.put("#", SIZE);
+		symbols.put("^", CAT);
 	}
 
 	public StreamTokenizer(Reader reader) {
@@ -77,11 +86,21 @@ public class StreamTokenizer implements Tokenizer {
 			intValue = Integer.parseInt(tokenString);
 			return;
 		}
+
 		if (scanner.group(SKIP.ordinal()) != null) { // SKIP
 			tokenType = SKIP;
+
 			return;
 		}
+
+		if (scanner.group(STRING.ordinal()) != null) { // STR
+			tokenType = STRING;
+			strValue = scanner.group(STR_CONTENT.ordinal());
+			return;
+		}
+
 		tokenType = symbols.get(tokenString); // a symbol
+
 		if (tokenType == null)
 			throw new AssertionError("Fatal error");
 	}
@@ -89,18 +108,24 @@ public class StreamTokenizer implements Tokenizer {
 	@Override
 	public TokenType next() throws TokenizerException {
 		do {
+
 			tokenType = null;
 			tokenString = "";
 			try {
+
 				if (hasNext && !scanner.hasNext()) {
+
 					hasNext = false;
 					return tokenType = EOF;
 				}
+
 				scanner.next();
+
 			} catch (ScannerException e) {
 				throw new TokenizerException(e);
 			}
 			checkType();
+
 		} while (tokenType == SKIP);
 		return tokenType;
 	}
@@ -140,7 +165,14 @@ public class StreamTokenizer implements Tokenizer {
 	}
 
 	@Override
+	public String strValue() {
+		checkValidToken(STRING);
+		return strValue;
+	}
+
+	@Override
 	public boolean hasNext() {
+		System.out.println(tokenType);
 		return hasNext;
 	}
 
