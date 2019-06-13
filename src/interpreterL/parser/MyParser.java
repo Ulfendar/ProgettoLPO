@@ -17,7 +17,7 @@ Prog ::= StmtSeq 'EOF'
  CAT   parseAdd
  Add ::= Mul ('+' Mul)*
  Mul::= Atom ('*' Atom)*
- Atom ::= '[' Exp ',' Exp ']' | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')'
+ Atom ::= #Atom | '[' Exp ',' Exp ']' | 'fst' Atom | 'snd' Atom | '-' Atom | '!' Atom | BOOL | NUM | ID | '(' Exp ')'
 */
 
 public class MyParser implements Parser {
@@ -85,8 +85,8 @@ public class MyParser implements Parser {
 			return parseAssignStmt();
 		case IF:
 			return parseIfStmt();
-			case WHILE:
-				return parseWhileStmt();
+		case WHILE:
+			return parseWhileStmt();
 
 		}
 	}

@@ -18,7 +18,6 @@ public class TypeCheck implements Visitor<Type> {
 	private final GenEnvironment<Type> env = new GenEnvironment<>();
 
 	private void checkBinOp(Exp left, Exp right, Type type) {
-		System.out.println(left + " " + right);
 		type.checkEqual(left.accept(this));
 		type.checkEqual(right.accept(this));
 	}
@@ -180,21 +179,29 @@ public class TypeCheck implements Visitor<Type> {
 	@Override
 	public Type visitUnion(Exp left, Exp right){
 
-		checkBinOp(left, right, SET);
-		return SET;
+		//checkBinOp(left, right, SET);
+		Type l = left.accept(this);
+		Type r = right.accept(this);
+		l.checkEqual(r);
+		return l;
 
 	}
 
 	public Type visitIntersection(Exp left, Exp right){
-		checkBinOp(left, right, SET);
-		return SET;
+		//checkBinOp(left, right, SET);
+		//return SET;
+		Type l = left.accept(this);
+		Type r = right.accept(this);
+		l.checkEqual(r);
+		return l;
+
 	}
 
 	public Type visitSize(Exp exp){
 		 Type type = exp.accept(this);
-		 System.out.println(type);
+
 		 type.checkEquals();
-		 System.out.println(type);
+
 		 return INT;
 	}
 
@@ -202,7 +209,7 @@ public class TypeCheck implements Visitor<Type> {
 	public Type visitIn(Exp elem, Exp set) {
 		Type type = set.accept(this);
 		type.checkIsSetType();
-		System.out.println(type);
+
 		type.getSetType().checkEqualIn(elem.accept(this));
 		return BOOL;
 	}

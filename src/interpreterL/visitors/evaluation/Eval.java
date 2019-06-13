@@ -106,7 +106,7 @@ public class Eval implements Visitor<Value> {
 	// dynamic semantics of expressions; a value is returned by the visitor
 
 	public Value visitExpList(List<Exp> exps){
-		List<Value> ret = new ArrayList<Value>();
+		List<Value> ret = new ArrayList<>();
 		for(Exp cur : exps)
 			ret.add(cur.accept(this));
 		return new SetValue(ret);
@@ -126,7 +126,9 @@ public class Eval implements Visitor<Value> {
 
 	public Value visitSize(Exp exp) {
 		try {
-			return new IntValue(exp.accept(this).asSet().Size());
+			IntValue i = new IntValue(exp.accept(this).asSet().Size());
+			System.out.println(i + " size!!");
+			return i;
 		} catch (EvaluatorException e) {
 			return new IntValue(exp.accept(this).asString().length());
 		}

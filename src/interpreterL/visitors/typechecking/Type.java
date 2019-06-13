@@ -6,15 +6,19 @@ import static interpreterL.visitors.typechecking.PrimtType.STRING;
 public interface Type {
 	default Type checkEqual(Type found) throws TypecheckerException {
 		System.out.println(1);
-		if (!equals(found))
+		if (!equals(found)) {
+			System.out.println("err checkEqualsIn");
 			throw new TypecheckerException(found.toString(), toString());
+		}
 		return this;
 	}
 
 	default Type checkEqualIn(Type found) throws TypecheckerException {
 		System.out.println(2);
-		if (!equals(found))
-			throw new TypecheckerException(found.toString(), found.toString()+" SET");
+		if (!equals(found)) {
+			System.out.println("err checkEqualsIn");
+			throw new TypecheckerException(found.toString(), found.toString() + " SET");
+		}
 		return this;
 	}
 

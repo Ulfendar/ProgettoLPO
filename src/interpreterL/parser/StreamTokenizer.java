@@ -89,7 +89,6 @@ public class StreamTokenizer implements Tokenizer {
 
 		if (scanner.group(SKIP.ordinal()) != null) { // SKIP
 			tokenType = SKIP;
-
 			return;
 		}
 

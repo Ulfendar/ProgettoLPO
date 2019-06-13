@@ -1,6 +1,7 @@
 package interpreterL.visitors.evaluation;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +11,12 @@ public class SetValue extends PrimValue<List<Value>>  {
 
     public SetValue(List<Value> elem) {
         super(elem);
+
+        Set<Value> set = new LinkedHashSet<>();
+        set.addAll(value);
+        value.clear();
+        value.addAll(set);
+
     }
 
     public List<Value> getValues() {
@@ -20,22 +27,23 @@ public class SetValue extends PrimValue<List<Value>>  {
 
     public SetValue Intersection(SetValue elem) {
 
-        SetValue set = new SetValue(new ArrayList<Value>() );
-        for(Value cur : value)
-            if(elem.isIn(cur))
+        List<Value> set = new ArrayList<>();
+        for(Value cur : value) {
+            if (elem.isIn(cur))
                 set.add(cur);
+        }
 
-            return set;
+        return new SetValue(new ArrayList<>(set));
     }
 
     public SetValue Union(SetValue elem) {
 
-        SetValue set = new SetValue(elem.getValues());
-        for(Value cur : value)
-            if(!set.isIn(cur))
-                set.add(cur);
+        List<Value> set = new ArrayList<Value>() {{
+            addAll(value);
+            addAll(elem.getValues());
+        }};
 
-        return set;
+        return new SetValue(new ArrayList<>(set));
     }
 
     public int Size(){
@@ -46,6 +54,11 @@ public class SetValue extends PrimValue<List<Value>>  {
     public void add(Value val){
         if(!value.contains(val))
             value.add(val);
+    }
+
+    public void remove(Value val){
+        if(value.contains(val))
+            value.remove(val);
     }
 
     public boolean isIn(Value val){
@@ -59,7 +72,7 @@ public class SetValue extends PrimValue<List<Value>>  {
     public final boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (!(obj instanceof PairValue))
+        if (!(obj instanceof SetValue))
             return false;
         SetValue op = (SetValue) obj;
         return value.equals(op.value);
