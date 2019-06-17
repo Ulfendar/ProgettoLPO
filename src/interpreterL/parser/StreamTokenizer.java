@@ -55,8 +55,8 @@ public class StreamTokenizer implements Tokenizer {
 		symbols.put("]", CLOSE_PAIR);
 		symbols.put(";", STMT_SEP);
 		symbols.put(",", EXP_SEP);
-		symbols.put("{", OPEN_BLOCK);
-		symbols.put("}", CLOSE_BLOCK);
+		symbols.put("{", OPEN_BLOCK_OR_SET);
+		symbols.put("}", CLOSE_BLOCK_OR_SET);
 		symbols.put("-", MINUS);
 		symbols.put("!", NOT);
 		symbols.put("&&", AND);

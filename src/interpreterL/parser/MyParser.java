@@ -1,9 +1,9 @@
 package interpreterL.parser;
 
-import static java.util.Objects.requireNonNull;
-import static interpreterL.parser.TokenType.*;
-
 import interpreterL.parser.ast.*;
+
+import static interpreterL.parser.TokenType.*;
+import static java.util.Objects.requireNonNull;
 
 /*
 Prog ::= StmtSeq 'EOF'
@@ -133,11 +133,11 @@ public class MyParser implements Parser {
 	}
 
 	private Block parseBlock() throws ParserException {
-		consume(OPEN_BLOCK);
+		consume(OPEN_BLOCK_OR_SET);
 		System.out.println(tokenizer.tokenType() + "pre block block");
 		StmtSeq stmts = parseStmtSeq();
 		System.out.println(tokenizer.tokenType() + "pre block block");
-		consume(CLOSE_BLOCK);
+		consume(CLOSE_BLOCK_OR_SET);
 		return new Block(stmts);
 	}
 
@@ -263,7 +263,7 @@ public class MyParser implements Parser {
 			return parseSnd();
 		case SIZE:
 			return parseSize();
-		case OPEN_BLOCK:
+		case OPEN_BLOCK_OR_SET:
 			return parseSet();
 		case STRING:
 			return parseStringLit();
@@ -276,9 +276,9 @@ public class MyParser implements Parser {
 	}
 
 	private Exp parseSet() throws ParserException {
-		consume(OPEN_BLOCK);
+		consume(OPEN_BLOCK_OR_SET);
 		Set set = new Set(parseExpList());
-		consume(CLOSE_BLOCK);
+		consume(CLOSE_BLOCK_OR_SET);
 
 		return set;
 	}

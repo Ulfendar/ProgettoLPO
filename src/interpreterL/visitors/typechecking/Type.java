@@ -1,6 +1,5 @@
 package interpreterL.visitors.typechecking;
 
-import static interpreterL.visitors.typechecking.PrimtType.SET;
 import static interpreterL.visitors.typechecking.PrimtType.STRING;
 
 public interface Type {
@@ -38,7 +37,7 @@ public interface Type {
 	default void checkIsSetType() throws TypecheckerException {
 		System.out.println(5);
 		if (!(this instanceof SetType)) {
-			throw new TypecheckerException(toString(), toString()+ " "+SET);
+			throw new TypecheckerException(toString(), SetType.TYPE_NAME);
 		}
 	}
 
@@ -54,10 +53,10 @@ public interface Type {
 		return ((SetType) this).getElemType();
 	}
 
-	default void checkSetOf() throws TypecheckerException {
+	default void checkSetOf(Type elem) throws TypecheckerException {
 		System.out.println(11);
-		if (!(this instanceof SetType))
-			throw new TypecheckerException(toString(), toString()+" "+SetType.TYPE_NAME);
+		if (!(this instanceof SetType)||!equals(elem))
+			throw new TypecheckerException(toString(), elem +" "+ SetType.TYPE_NAME);
 
 	}
 

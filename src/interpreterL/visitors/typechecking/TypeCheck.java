@@ -1,17 +1,13 @@
 package interpreterL.visitors.typechecking;
 
-import static interpreterL.visitors.typechecking.PrimtType.*;
-
-
 import interpreterL.environments.EnvironmentException;
 import interpreterL.environments.GenEnvironment;
 import interpreterL.parser.ast.*;
 import interpreterL.visitors.Visitor;
-import interpreterL.visitors.evaluation.SetValue;
-import interpreterL.visitors.evaluation.Value;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static interpreterL.visitors.typechecking.PrimtType.*;
 
 public class TypeCheck implements Visitor<Type> {
 
@@ -181,7 +177,9 @@ public class TypeCheck implements Visitor<Type> {
 
 		//checkBinOp(left, right, SET);
 		Type l = left.accept(this);
+		l.checkIsSetType();
 		Type r = right.accept(this);
+		r.checkIsSetType();
 		l.checkEqual(r);
 		return l;
 
@@ -190,8 +188,11 @@ public class TypeCheck implements Visitor<Type> {
 	public Type visitIntersection(Exp left, Exp right){
 		//checkBinOp(left, right, SET);
 		//return SET;
-		Type l = left.accept(this);
 		Type r = right.accept(this);
+		r.checkIsSetType();
+		Type l = left.accept(this);
+		l.checkIsSetType();
+
 		l.checkEqual(r);
 		return l;
 
@@ -207,6 +208,11 @@ public class TypeCheck implements Visitor<Type> {
 
 	@Override
 	public Type visitIn(Exp elem, Exp set) {
+
+
+//		Type el = elem.accept(this);
+//		set.accept(this).checkSetOf(el);
+//		System.out.println(el);
 		Type type = set.accept(this);
 		type.checkIsSetType();
 
