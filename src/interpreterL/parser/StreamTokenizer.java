@@ -1,10 +1,10 @@
 package interpreterL.parser;
 
-import static interpreterL.parser.TokenType.*;
-
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+
+import static interpreterL.parser.TokenType.*;
 
 public class StreamTokenizer implements Tokenizer {
 	private static final String regEx;
@@ -25,7 +25,7 @@ public class StreamTokenizer implements Tokenizer {
 		// token type
 		final String skipRegEx = "(\\s+|//.*)"; // group 1
 		final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 2
-		final String numRegEx = "(0|[1-9][0-9]*)"; // group 3
+		final String numRegEx = "(0[xX][0-9a-fA-F]+|0|[1-9][0-9]*)"; // group 3
 		final String stringRegEx = "(\"((?:[^\"\\\\]|\\\\[\"\\\\])*)\")"; //group 4
 		final String symbolRegEx = "\\+|\\*|==|=|\\(|\\)|\\[|\\]|;|,|\\{|\\}|-|!|&&|\\\\/|/\\\\|#|\\^";
 		regEx = skipRegEx + "|" + identRegEx + "|" + numRegEx + "|" +  stringRegEx +"|"+ symbolRegEx;
@@ -83,7 +83,7 @@ public class StreamTokenizer implements Tokenizer {
 		}
 		if (scanner.group(NUM.ordinal()) != null) { // NUM
 			tokenType = NUM;
-			intValue = Integer.parseInt(tokenString);
+			intValue = Integer.decode(tokenString);
 			return;
 		}
 
