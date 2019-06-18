@@ -1,11 +1,6 @@
 package interpreterL.visitors.evaluation;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.Objects.requireNonNull;
+import java.util.*;
 
 public class SetValue extends PrimValue<List<Value>>  {
 
@@ -75,6 +70,7 @@ public class SetValue extends PrimValue<List<Value>>  {
         if (!(obj instanceof SetValue))
             return false;
         SetValue op = (SetValue) obj;
+
         return value.equals(op.value);
     }
 

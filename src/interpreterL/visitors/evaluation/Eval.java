@@ -200,7 +200,9 @@ public class Eval implements Visitor<Value> {
 
 	@Override
 	public Value visitSet(ExpSeq set) {
-		return set.accept(this);
+
+	    Value x = set.accept(this);
+	    return x;
 	}
 
 	@Override
