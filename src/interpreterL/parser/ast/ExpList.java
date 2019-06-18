@@ -2,11 +2,11 @@ package interpreterL.parser.ast;
 
 import interpreterL.visitors.Visitor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExpList implements ExpSeq {
-    private List<Exp> exps = new ArrayList<>();
+    private Set<Exp> exps = new HashSet<>();
 
     public ExpList(Exp exp){
         add(exp);

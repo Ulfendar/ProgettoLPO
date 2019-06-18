@@ -2,16 +2,16 @@ package interpreterL.visitors.evaluation;
 
 import interpreterL.environments.EnvironmentException;
 import interpreterL.environments.GenEnvironment;
-import interpreterL.parser.*;
 import interpreterL.parser.StreamTokenizer;
+import interpreterL.parser.*;
 import interpreterL.parser.ast.*;
 import interpreterL.visitors.Visitor;
 import interpreterL.visitors.typechecking.TypeCheck;
 import interpreterL.visitors.typechecking.TypecheckerException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static java.lang.System.err;
 import static java.util.Objects.requireNonNull;
@@ -105,8 +105,8 @@ public class Eval implements Visitor<Value> {
 
 	// dynamic semantics of expressions; a value is returned by the visitor
 
-	public Value visitExpList(List<Exp> exps){
-		List<Value> ret = new ArrayList<>();
+	public Value visitExpList(Set<Exp> exps){
+		Set<Value> ret = new HashSet<Value>();
 		for(Exp cur : exps)
 			ret.add(cur.accept(this));
 		return new SetValue(ret);

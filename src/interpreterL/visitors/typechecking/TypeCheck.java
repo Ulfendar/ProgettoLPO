@@ -5,7 +5,8 @@ import interpreterL.environments.GenEnvironment;
 import interpreterL.parser.ast.*;
 import interpreterL.visitors.Visitor;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
 
 import static interpreterL.visitors.typechecking.PrimtType.*;
 
@@ -159,10 +160,11 @@ public class TypeCheck implements Visitor<Type> {
 	}
 
 
-	public Type visitExpList(List<Exp> exps){
-		Type type = exps.get(0).accept(this);
-		for(Exp exp : exps)
-			type.checkEqual(exp.accept(this));
+	public Type visitExpList(Set<Exp> exps){
+		Iterator<Exp> iter = exps.iterator();
+		Type type = iter.next().accept(this);
+		while (iter.hasNext())
+			type.checkEqual(iter.next().accept(this));
 		return type;
 	}
 

@@ -2,7 +2,7 @@ package interpreterL.visitors;
 
 import interpreterL.parser.ast.*;
 
-import java.util.List;
+import java.util.Set;
 
 public interface Visitor<T> {
 	T visitAdd(Exp left, Exp right);
@@ -47,7 +47,7 @@ public interface Visitor<T> {
 
 	T visitSet(ExpSeq res);
 
-	T visitExpList(List<Exp> exps);
+	T visitExpList(Set<Exp> exps);
 
 	T visitUnion(Exp set1, Exp set2);
 

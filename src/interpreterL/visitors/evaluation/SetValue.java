@@ -2,43 +2,36 @@ package interpreterL.visitors.evaluation;
 
 import java.util.*;
 
-public class SetValue extends PrimValue<List<Value>>  {
+public class SetValue extends PrimValue<Set<Value>>  {
 
-    public SetValue(List<Value> elem) {
+    public SetValue(Set<Value> elem) {
         super(elem);
 
-        Set<Value> set = new LinkedHashSet<>();
+        /*Set<Value> set = new LinkedHashSet<>();
         set.addAll(value);
         value.clear();
-        value.addAll(set);
+        value.addAll(set);*/
 
     }
 
-    public List<Value> getValues() {
+    public Set<Value> getValues() {
         return value;
     }
 
-
-
     public SetValue Intersection(SetValue elem) {
 
-        List<Value> set = new ArrayList<>();
-        for(Value cur : value) {
-            if (elem.isIn(cur))
-                set.add(cur);
-        }
+        Set<Value> set = new HashSet<>(value);
+        set.retainAll(elem.getValues());
 
-        return new SetValue(new ArrayList<>(set));
+        return new SetValue(new HashSet<>(set));
     }
 
     public SetValue Union(SetValue elem) {
 
-        List<Value> set = new ArrayList<Value>() {{
-            addAll(value);
-            addAll(elem.getValues());
-        }};
+        Set<Value> set = new HashSet<>(value);
+        set.addAll(elem.getValues());
 
-        return new SetValue(new ArrayList<>(set));
+        return new SetValue(new HashSet<>(set));
     }
 
     public int Size(){
@@ -81,16 +74,13 @@ public class SetValue extends PrimValue<List<Value>>  {
 
     @Override
     public String toString() {
-        if (value.isEmpty()){
-            return "{}";
-        }
-        String string = "{";
-        string += String.valueOf(value.get(0));
-
-        for(int i =1; i<value.size(); ++i)
-            string += ", "+ String.valueOf(value.get(i));
-
+     
+        String string = "{ ";
+        Iterator <Value> iter = value.iterator();
+        while(iter.hasNext())
+            string+=iter.next().toString()+", ";
         string += "}";
+
         return string;
     }
 
