@@ -162,7 +162,9 @@ public class TypeCheck implements Visitor<Type> {
 
 	public Type visitExpList(Set<Exp> exps){
 		Iterator<Exp> iter = exps.iterator();
-		Type type = iter.next().accept(this);
+		Type type = null;
+		if(iter.hasNext())
+			type = iter.next().accept(this);
 		while (iter.hasNext())
 			type.checkEqual(iter.next().accept(this));
 		return type;
@@ -215,10 +217,11 @@ public class TypeCheck implements Visitor<Type> {
 //		Type el = elem.accept(this);
 //		set.accept(this).checkSetOf(el);
 //		System.out.println(el);
-		Type type = set.accept(this);
-		type.checkIsSetType();
+		Type typeS = set.accept(this);
+		Type typeE = elem.accept(this);
+		typeS.checkIsSetTypeOf(typeE);
 
-		type.getSetType().checkEqualIn(elem.accept(this));
+		//typeS.getSetType().checkEqualIn(elem.accept(this));
 		return BOOL;
 	}
 

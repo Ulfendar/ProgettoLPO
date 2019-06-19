@@ -106,7 +106,7 @@ public class Eval implements Visitor<Value> {
 	// dynamic semantics of expressions; a value is returned by the visitor
 
 	public Value visitExpList(Set<Exp> exps){
-		Set<Value> ret = new HashSet<Value>();
+		Set<Value> ret = new HashSet<>();
 		for(Exp cur : exps)
 			ret.add(cur.accept(this));
 		return new SetValue(ret);

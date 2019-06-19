@@ -77,8 +77,9 @@ public class SetValue extends PrimValue<Set<Value>>  {
      
         String string = "{ ";
         Iterator <Value> iter = value.iterator();
+        if(iter.hasNext()) string += iter.next().toString()+" ";
         while(iter.hasNext())
-            string+=iter.next().toString()+", ";
+            string+=", "+iter.next().toString()+" ";
         string += "}";
 
         return string;
