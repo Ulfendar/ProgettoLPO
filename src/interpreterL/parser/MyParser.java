@@ -74,14 +74,13 @@ public class MyParser implements Parser {
 	private Stmt parseStmt() throws ParserException {
 		switch (tokenizer.tokenType()) {
 		default:
-			System.out.println(tokenizer.tokenType() + "err");
+
 			unexpectedTokenError();
 		case PRINT:
 			return parsePrintStmt();
 		case LET:
 			return parseVarStmt();
 		case IDENT:
-			System.out.println(tokenizer.tokenType() + "ident block");
 			return parseAssignStmt();
 		case IF:
 			return parseIfStmt();
@@ -92,7 +91,6 @@ public class MyParser implements Parser {
 	}
 
 	private PrintStmt parsePrintStmt() throws ParserException {
-		System.out.println("print");
 		consume(PRINT); // or tryNext();
 		return new PrintStmt(parseExp());
 	}
@@ -134,9 +132,7 @@ public class MyParser implements Parser {
 
 	private Block parseBlock() throws ParserException {
 		consume(OPEN_BLOCK_OR_SET);
-		System.out.println(tokenizer.tokenType() + "pre block block");
 		StmtSeq stmts = parseStmtSeq();
-		System.out.println(tokenizer.tokenType() + "pre block block");
 		consume(CLOSE_BLOCK_OR_SET);
 		return new Block(stmts);
 	}

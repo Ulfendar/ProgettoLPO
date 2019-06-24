@@ -4,9 +4,8 @@ import static interpreterL.visitors.typechecking.PrimtType.STRING;
 
 public interface Type {
 	default Type checkEqual(Type found) throws TypecheckerException {
-		
+
 		if (!equals(found)) {
-			System.out.println("err checkEqualsIn");
 			throw new TypecheckerException(found.toString(), toString());
 		}
 		return this;

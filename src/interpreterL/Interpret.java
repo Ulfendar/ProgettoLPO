@@ -46,7 +46,7 @@ public class Interpret {
 
         }
         if (!(r==(null))){
-            System.out.println("Running file: " + r.getName());
+            System.out.println("Interpreting file: " + r.getName());
         }
         Reader input;
         if(in != null) input = new InputStreamReader(in);

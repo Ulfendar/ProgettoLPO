@@ -2,18 +2,13 @@ package interpreterL.visitors.evaluation;
 
 import interpreterL.environments.EnvironmentException;
 import interpreterL.environments.GenEnvironment;
-import interpreterL.parser.StreamTokenizer;
-import interpreterL.parser.*;
 import interpreterL.parser.ast.*;
 import interpreterL.visitors.Visitor;
-import interpreterL.visitors.typechecking.TypeCheck;
-import interpreterL.visitors.typechecking.TypecheckerException;
 
-import java.io.*;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.lang.System.err;
 import static java.util.Objects.requireNonNull;
 
 public class Eval implements Visitor<Value> {
@@ -98,43 +93,42 @@ public class Eval implements Visitor<Value> {
 
 	@Override
 	public Value visitWhileStmt(Exp exp, Block block) {
-		while(exp.accept(this).asBool())
-		block.accept(this);
+		while (exp.accept(this).asBool())
+			block.accept(this);
 		return null;
 	}
 
 	// dynamic semantics of expressions; a value is returned by the visitor
 
-	public Value visitExpList(Set<Exp> exps){
+	public Value visitExpList(Set<Exp> exps) {
 		Set<Value> ret = new HashSet<>();
-		for(Exp cur : exps)
+		for (Exp cur : exps)
 			ret.add(cur.accept(this));
 		return new SetValue(ret);
 	}
 
 
 	@Override
-	public Value visitUnion(Exp first, Exp sec){
-		Value x =  (first.accept(this)).asSet().Union(sec.accept(this).asSet());
+	public Value visitUnion(Exp first, Exp sec) {
+		Value x = (first.accept(this)).asSet().Union(sec.accept(this).asSet());
 		return x;
 	}
 
-	public Value visitIntersection(Exp first, Exp sec){
-		Value x =  (first.accept(this)).asSet().Intersection(sec.accept(this).asSet());
+	public Value visitIntersection(Exp first, Exp sec) {
+		Value x = (first.accept(this)).asSet().Intersection(sec.accept(this).asSet());
 		return x;
 	}
 
 	public Value visitSize(Exp exp) {
 		try {
 			IntValue i = new IntValue(exp.accept(this).asSet().Size());
-			System.out.println(i + " size!!");
 			return i;
 		} catch (EvaluatorException e) {
 			return new IntValue(exp.accept(this).asString().length());
 		}
 	}
 
-	public Value visitIn(Exp first, Exp sec){
+	public Value visitIn(Exp first, Exp sec) {
 		return new BoolValue(sec.accept(this).asSet().isIn(first.accept(this)));
 	}
 
@@ -201,8 +195,8 @@ public class Eval implements Visitor<Value> {
 	@Override
 	public Value visitSet(ExpSeq set) {
 
-	    Value x = set.accept(this);
-	    return x;
+		Value x = set.accept(this);
+		return x;
 	}
 
 	@Override
@@ -214,89 +208,5 @@ public class Eval implements Visitor<Value> {
 	public Value visitCat(Exp left, Exp right) {
 		return new StringValue(left.accept(this).asString() + right.accept(this).asString());
 	}
-
-	/*public static void main(String[] args) {
-		try (Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(System.in))) {
-			Parser parser = new MyParser(tokenizer);
-			Prog prog = parser.parseProg();
-			prog.accept(new TypeCheck());
-			prog.accept(new Eval());
-		} catch (TokenizerException e) {
-			err.println("Tokenizer error: " + e.getMessage());
-		} catch (ParserException e) {
-			err.println("Syntax error: " + e.getMessage());
-		} catch (TypecheckerException e) {
-			err.println("Static error: " + e.getMessage());
-		} catch (EvaluatorException e) {
-			err.println("Dynamic error: " + e.getMessage());
-		} catch (Throwable e) {
-			err.println("Unexpected error.");
-			e.printStackTrace();
-		}
-	}*/
-
-	public static void main(String[] args) throws IOException {
-
-		FileInputStream in =  null;
-		FileOutputStream output = null;
-		File r;
-		boolean tc = true;
-
-
-		for(int i = 0; i < args.length; ++i ){
-
-			if(args[i].equals("-ntc"))
-					tc = false;
-
-			else if(args[i].equals("-i")){
-
-				if(i+1 > args.length || !args[i+1].endsWith(".txt"))
-					throw new IllegalArgumentException();
-
-				r = new File(args[i+1]);
-				try {
-					in = new FileInputStream(r);
-				}catch(IOException ex){ throw new IllegalArgumentException();}
-
-			}
-			else if(args[i].equals("-o")){
-				if(i+1 > args.length || !args[i+1].endsWith(".txt"))
-					throw new IllegalArgumentException();
-				output = new FileOutputStream(args[i+1]);
-			}
-
-
-		}
-
-		Reader input;
-		if(in != null) input = new InputStreamReader(in);
-		else input = new InputStreamReader(System.in);
-
-		try (Tokenizer tokenizer = new StreamTokenizer(input)) {
-			Parser parser = new MyParser(tokenizer);
-			Prog prog = parser.parseProg();
-			if(tc)
-				prog.accept(new TypeCheck());
-			if(output!= null) {
-				PrintWriter print = new PrintWriter(output);
-				prog.accept(new Eval(print));
-				print.close();
-			}
-			else
-				prog.accept(new Eval());
-		} catch (TokenizerException e) {
-			err.println("Tokenizer error: " + e.getMessage());
-		} catch (ParserException e) {
-			err.println("Syntax error: " + e.getMessage());
-		} catch (TypecheckerException e) {
-			err.println("Static error: " + e.getMessage());
-		} catch (EvaluatorException e) {
-			err.println("Dynamic error: " + e.getMessage());
-		} catch (Throwable e) {
-			err.println("Unexpected error.");
-			e.printStackTrace();
-		}
-	}
-
 
 }
