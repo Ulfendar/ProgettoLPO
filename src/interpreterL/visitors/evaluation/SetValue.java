@@ -40,13 +40,11 @@ public class SetValue extends PrimValue<Set<Value>>  {
 
 
     public void add(Value val){
-        if(!value.contains(val))
-            value.add(val);
+        value.add(val);
     }
 
     public void remove(Value val){
-        if(value.contains(val))
-            value.remove(val);
+        value.remove(val);
     }
 
     public boolean isIn(Value val){

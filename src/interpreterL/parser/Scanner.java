@@ -9,5 +9,5 @@ public interface Scanner extends AutoCloseable {
 
 	String group(int group);
 
-	public void close() throws ScannerException;
+	void close() throws ScannerException;
 }

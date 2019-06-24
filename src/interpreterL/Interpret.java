@@ -1,7 +1,7 @@
 package interpreterL;
 
-import interpreterL.parser.*;
 import interpreterL.parser.StreamTokenizer;
+import interpreterL.parser.*;
 import interpreterL.parser.ast.Prog;
 import interpreterL.visitors.evaluation.Eval;
 import interpreterL.visitors.evaluation.EvaluatorException;
@@ -17,7 +17,7 @@ public class Interpret {
 
         FileInputStream in =  null;
         FileOutputStream output = null;
-        File r;
+        File r = null;
         boolean tc = true;
 
 
@@ -45,7 +45,9 @@ public class Interpret {
 
 
         }
-
+        if (!(r==(null))){
+            System.out.println("Running file: " + r.getName());
+        }
         Reader input;
         if(in != null) input = new InputStreamReader(in);
         else input = new InputStreamReader(System.in);

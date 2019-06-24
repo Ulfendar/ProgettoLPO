@@ -178,8 +178,6 @@ public class TypeCheck implements Visitor<Type> {
 
 	@Override
 	public Type visitUnion(Exp left, Exp right){
-
-		//checkBinOp(left, right, SET);
 		Type l = left.accept(this);
 		l.checkIsSetType();
 		Type r = right.accept(this);
@@ -190,13 +188,10 @@ public class TypeCheck implements Visitor<Type> {
 	}
 
 	public Type visitIntersection(Exp left, Exp right){
-		//checkBinOp(left, right, SET);
-		//return SET;
 		Type r = right.accept(this);
 		r.checkIsSetType();
 		Type l = left.accept(this);
 		l.checkIsSetType();
-
 		l.checkEqual(r);
 		return l;
 
@@ -212,16 +207,9 @@ public class TypeCheck implements Visitor<Type> {
 
 	@Override
 	public Type visitIn(Exp elem, Exp set) {
-
-
-//		Type el = elem.accept(this);
-//		set.accept(this).checkSetOf(el);
-//		System.out.println(el);
 		Type typeS = set.accept(this);
 		Type typeE = elem.accept(this);
 		typeS.checkIsSetTypeOf(typeE);
-
-		//typeS.getSetType().checkEqualIn(elem.accept(this));
 		return BOOL;
 	}
 
