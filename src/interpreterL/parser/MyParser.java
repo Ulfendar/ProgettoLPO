@@ -141,7 +141,6 @@ public class MyParser implements Parser {
 		ExpList exps = new ExpList(parseExp());
 		while (tokenizer.tokenType() == EXP_SEP) {
 			tryNext();
-
 			exps.add(parseExp());
 		}
 		return exps;
@@ -176,7 +175,6 @@ public class MyParser implements Parser {
 
 		while (tokenizer.tokenType() == IN) {
 			tryNext();
-
 			exp = new In(exp, parseUnion());
 		}
 
@@ -191,7 +189,7 @@ public class MyParser implements Parser {
 		while(tokenizer.tokenType()==UNION) {
 			consume(UNION);
 
-			return new Union(exp, parseIntersection());
+			exp = new Union(exp, parseIntersection());
 		}
 		return exp;
 	}
@@ -202,7 +200,7 @@ public class MyParser implements Parser {
 
 		while(tokenizer.tokenType()==INTERSECTION) {
 			consume(INTERSECTION);
-			return new Intersection(exp, parseCat());
+			exp = new Intersection(exp, parseCat());
 		}
 		return exp;
 	}
@@ -210,6 +208,7 @@ public class MyParser implements Parser {
 
 	private Exp parseCat() throws ParserException {
 		Exp exp = parseAdd();
+
 		while (tokenizer.tokenType() == CAT) {
 			tryNext();
 			exp = new Cat(exp, parseAdd());

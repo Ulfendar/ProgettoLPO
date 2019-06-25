@@ -172,8 +172,7 @@ public class TypeCheck implements Visitor<Type> {
 
 	@Override
 	public Type visitSet(ExpSeq elem){
-		SetType set = new SetType(elem.accept(this));
-		return set;
+		return new SetType(elem.accept(this));
 	}
 
 	@Override

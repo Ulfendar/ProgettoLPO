@@ -1,7 +1,5 @@
 package interpreterL.visitors.evaluation;
 
-import java.util.Set;
-
 public interface Value {
 	/* default conversion methods */
 	default int asInt() {

@@ -110,19 +110,16 @@ public class Eval implements Visitor<Value> {
 
 	@Override
 	public Value visitUnion(Exp first, Exp sec) {
-		Value x = (first.accept(this)).asSet().Union(sec.accept(this).asSet());
-		return x;
+        return (first.accept(this)).asSet().Union(sec.accept(this).asSet());
 	}
 
 	public Value visitIntersection(Exp first, Exp sec) {
-		Value x = (first.accept(this)).asSet().Intersection(sec.accept(this).asSet());
-		return x;
+        return (first.accept(this)).asSet().Intersection(sec.accept(this).asSet());
 	}
 
 	public Value visitSize(Exp exp) {
 		try {
-			IntValue i = new IntValue(exp.accept(this).asSet().Size());
-			return i;
+            return new IntValue(exp.accept(this).asSet().Size());
 		} catch (EvaluatorException e) {
 			return new IntValue(exp.accept(this).asString().length());
 		}
@@ -195,8 +192,7 @@ public class Eval implements Visitor<Value> {
 	@Override
 	public Value visitSet(ExpSeq set) {
 
-		Value x = set.accept(this);
-		return x;
+        return set.accept(this);
 	}
 
 	@Override

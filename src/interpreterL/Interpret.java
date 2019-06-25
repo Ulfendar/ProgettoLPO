@@ -23,24 +23,28 @@ public class Interpret {
 
         for(int i = 0; i < args.length; ++i ){
 
-            if(args[i].equals("-ntc"))
-                tc = false;
+            switch (args[i]) {
+                case "-ntc":
+                    tc = false;
+                    break;
+                case "-i":
 
-            else if(args[i].equals("-i")){
+                    if (i + 1 > args.length || !args[i + 1].endsWith(".txt"))
+                        throw new IllegalArgumentException();
 
-                if(i+1 > args.length || !args[i+1].endsWith(".txt"))
-                    throw new IllegalArgumentException();
+                    r = new File(args[i + 1]);
+                    try {
+                        in = new FileInputStream(r);
+                    } catch (IOException ex) {
+                        throw new IllegalArgumentException();
+                    }
 
-                r = new File(args[i+1]);
-                try {
-                    in = new FileInputStream(r);
-                }catch(IOException ex){ throw new IllegalArgumentException();}
-
-            }
-            else if(args[i].equals("-o")){
-                if(i+1 > args.length || !args[i+1].endsWith(".txt"))
-                    throw new IllegalArgumentException();
-                output = new FileOutputStream(args[i+1]);
+                    break;
+                case "-o":
+                    if (i + 1 > args.length || !args[i + 1].endsWith(".txt"))
+                        throw new IllegalArgumentException();
+                    output = new FileOutputStream(args[i + 1]);
+                    break;
             }
 
 

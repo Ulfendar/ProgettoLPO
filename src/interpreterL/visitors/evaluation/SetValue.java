@@ -73,14 +73,14 @@ public class SetValue extends PrimValue<Set<Value>>  {
     @Override
     public String toString() {
      
-        String string = "{ ";
+        StringBuilder string = new StringBuilder("{ ");
         Iterator <Value> iter = value.iterator();
-        if(iter.hasNext()) string += iter.next().toString()+" ";
+        if(iter.hasNext()) string.append(iter.next().toString()).append(" ");
         while(iter.hasNext())
-            string+=", "+iter.next().toString()+" ";
-        string += "}";
+            string.append(", ").append(iter.next().toString()).append(" ");
+        string.append("}");
 
-        return string;
+        return string.toString();
     }
 
 
